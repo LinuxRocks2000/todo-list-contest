@@ -1,0 +1,111 @@
+* {
+    font-family: sans-serif;
+    color: white;
+}
+
+body {
+    display: flex;
+    height: 100vh;
+    width: 100vw;
+    padding: 0px;
+    margin: 0px;
+    padding-top: 1.2em; /* for the header */
+    justify-content: stretch;
+    align-items: stretch;
+}
+
+#header {
+    height: 1em;
+    background-color: black;
+    text-align: center;
+    position: absolute;
+    width: 100vw;
+    top: 0px;
+    left: 0px;
+    color: white;
+    padding-bottom: 0.2em;
+}
+
+#nav {
+    background-color: rgb(51, 23, 51);
+    overflow-x: auto;
+    width: fit-content;
+    max-width: 20%;
+}
+
+body > div {
+    width: 100%;
+}
+
+#content {
+    box-sizing: border-box;
+    padding: 50px;
+    padding-left: 100px;
+    padding-right: 100px;
+    background-color: rgb(51, 51, 51);
+}
+
+#nav > span {
+    padding: 20px;
+    text-align: center;
+    background-color: blue;
+    width: 100%;
+    display: inline-block;
+    box-sizing: border-box;
+}
+
+ul {
+    list-style-type: none;
+    position: relative;
+    padding-top: 0px;
+    margin-top: 0px;
+}
+
+input[type="checkbox"] {
+    display: none;
+}
+
+.nest-box + label {
+    display: block;
+}
+
+.nest-box + label, li {
+    text-align: center;
+    border: 2px solid crimson;
+    padding: 5px;
+    border-radius: 2px;
+    margin: 5px;
+    box-sizing: border-box;
+}
+
+li.nest {
+    border: 2px solid blueviolet;
+    box-sizing: border-box;
+}
+
+.nest-box + label:after {
+    content: '^';
+}
+
+.nest-box:checked + label:after {
+    content: 'v';
+}
+
+.nest-box + label + ul {
+    display: none;
+}
+
+.nest-box:checked + label + ul {
+    display: initial;
+}
+
+#nav > div {
+    overflow-x: scroll;
+    height: 100%;
+}
+
+#nav > div > ul {
+    width: max-content;
+    padding: 0px;
+    margin: 10px;
+}
