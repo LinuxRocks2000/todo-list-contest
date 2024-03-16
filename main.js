@@ -1,5 +1,6 @@
+const $ = (name) => document.getElementById(name); // I am a TERRIBLE person
 if (!localStorage.list) { // set a default if necessary
-    localStorage.list = `[{"name": "Hello", "content": "DATA DATA DATA"}, [{"name": "World", "content": "DATA DATA DATA"}, {"name": "Nah", "content": "DATA DATA DATA"}]]`;
+    localStorage.list = `[]`;
 }
 
 // we use a Proxy to manipulate localStorage and the DOM while outwardly only doing simple manipulations on an array
@@ -10,6 +11,7 @@ var list = undefined;
 var renderedOutCounter = 0;
 var hovered = undefined;
 var hoverParent = undefined;
+var percModeFrac = false;
 function delThing() {
     hoverParent.remove(hovered);
     completenessUpdate();
@@ -33,7 +35,7 @@ const listProxyHandler = {
                 if (hovered == item) {
                     hovered = undefined;
                     hoverParent = undefined;
-                    document.getElementById("utilbar").style.display = "none";
+                    $("utilbar").style.display = "none";
                 }
             };
         }
@@ -101,31 +103,31 @@ function addDir(point) {
 
 function goToEditor(thing) {
     console.log(thing);
-    document.getElementById("content").innerHTML = thing.content;
-    document.getElementById("content").oninput = () => {
-        thing.content = document.getElementById("content").innerHTML;
+    $("content").innerHTML = thing.content;
+    $("content").oninput = () => {
+        thing.content = $("content").innerHTML;
         commit();
     };
-    document.getElementById("weight").value = thing.weight;
-    document.getElementById("weight").oninput = () => {
-        var v = document.getElementById("weight").value;
+    $("weight").value = thing.weight;
+    $("weight").oninput = () => {
+        var v = $("weight").value;
         if (v == "" || v < 1) { // catch the failure cases with invalid inputs
             thing.weight = 1;
         }
         else {
             thing.weight = v - 0;
         }
-        document.getElementById("weight").value = thing.weight;
+        $("weight").value = thing.weight;
         commit();
         completenessUpdate();
     };
-    document.getElementById("checkboxy").checked = thing.complete;
-    document.getElementById("checkboxy").onclick = () => {
-        thing.complete = document.getElementById("checkboxy").checked;
+    $("checkboxy").checked = thing.complete;
+    $("checkboxy").onclick = () => {
+        thing.complete = $("checkboxy").checked;
         commit();
         completenessUpdate();
     };
-    document.getElementById("completion").style.display = "";
+    $("completion").style.display = "";
 }
 
 
@@ -139,10 +141,17 @@ function renderElement(at, parent) { // do the INITIAL render of the tree (calli
         input.id = "nestbox" + renderedOutCounter;
         input.classList.add("nest-box");
         var label = document.createElement("label");
+        label.tabIndex = 0;
         label.setAttribute("for", "nestbox" + renderedOutCounter);
         var nest = document.createElement("ul");
         var perc = document.createElement("span");
         perc.classList.add("percentage");
+        perc.onclick = (evt) => {
+            percModeFrac = !percModeFrac;
+            completenessUpdate();
+            evt.stopPropagation();
+            return false;
+        };
         item.appendChild(input);
         item.appendChild(label);
         item.appendChild(nest);
@@ -152,7 +161,7 @@ function renderElement(at, parent) { // do the INITIAL render of the tree (calli
         }
         item.onmouseover = (evt) => {
             if (!hovered || hovered != at) {
-                var utilbar = document.getElementById("utilbar");
+                var utilbar = $("utilbar");
                 utilbar.style.display = "";
                 utilbar.classList.add("directoryMode");
                 utilbar.classList.remove("itemMode");
@@ -161,7 +170,7 @@ function renderElement(at, parent) { // do the INITIAL render of the tree (calli
                 hovered = at;
                 hoverParent = parent;
             }
-            evt.stopPropagation();
+            if (evt) { evt.stopPropagation(); }
         };
     }
     else {
@@ -171,12 +180,15 @@ function renderElement(at, parent) { // do the INITIAL render of the tree (calli
         };
         item.contentEditable = true;
         item.oninput = () => {
-            at.name = item.innerText;
+            at.name = item.innerText.replace("\n", "").trim();
+            if (item.innerText != at.name) {
+                item.innerText = at.name;
+            }
             commit();
         };
         item.onmouseover = (evt) => {
             if (!hovered || hovered != at) {
-                var utilbar = document.getElementById("utilbar");
+                var utilbar = $("utilbar");
                 utilbar.style.display = "";
                 utilbar.classList.add("itemMode");
                 utilbar.classList.remove("directoryMode");
@@ -185,7 +197,7 @@ function renderElement(at, parent) { // do the INITIAL render of the tree (calli
                 hovered = at;
                 hoverParent = parent;
             }
-            evt.stopPropagation();
+            if (evt) { evt.stopPropagation(); }
         };
     }
     renderedOutCounter++;
@@ -210,12 +222,19 @@ function completenessUpdate(thing) { // render complete-ness values for every co
         }
     }
     thing.el.style.setProperty("--completeness", (ret[0] / ret[1] * 100) + "%");
-    thing.el.querySelector("label > span.percentage").innerText = Math.round(ret[0] / ret[1] * 100) + "%"; // TODO: allow fractional mode
+    var writeOutEl = undefined;
+    if (thing != list) {
+        writeOutEl = thing.el.querySelector("label > span.percentage");
+    }
+    else {
+        writeOutEl = $("globalCompletion");
+    }
+    writeOutEl.innerText = ret[1] == 0 ? 0 : (percModeFrac ? (ret[0] + "/" + ret[1]) : (Math.round(ret[0] / ret[1] * 100) + "%"));
     return ret;
 }
 
 load();
-var r = document.getElementById("navInside");
+var r = $("navInside");
 r.innerHTML = ""; // "quick and dirty" way to clear the todo list tree
 var todoListRoot = document.createElement("ul");
 list.el = todoListRoot;
@@ -224,3 +243,98 @@ for (var i = 0; i < list.length; i++) {
 }
 r.appendChild(todoListRoot);
 completenessUpdate();
+
+var doomsday = {
+    code: "DoomsdaySuxxorz!!",
+    completionPoint: 0
+};
+
+window.onkeyup = (evt) => {
+    if (evt.keyCode == 9) {
+        if (document.activeElement.onmouseover) {
+            document.activeElement.onmouseover();
+        }
+        else if (document.activeElement.tagName == "LABEL") {
+            document.activeElement.parentNode.onmouseover();
+        }
+    }
+    if (evt.key == "Enter") {
+        if (document.activeElement.tagName == "LABEL") {
+            var inp = $(document.activeElement.getAttribute("for"));
+            inp.checked = !inp.checked;
+        }
+        else if (document.activeElement.onclick && document.activeElement.tagName != "BUTTON") { // triggers onclick upon Enter for items that aren't used to that sort of thing
+            document.activeElement.onclick();
+            if (document.activeElement.tagName == "LI") {
+                $("content").focus();
+            }
+        }
+    }
+    if (evt.shiftKey && evt.altKey) {
+        if (evt.key == "D") {
+            if (document.activeElement.tagName == "LABEL" || document.activeElement.tagName == "LI") {
+                delThing();
+            }
+        }
+        if (evt.key == "N") {
+            if (document.activeElement.tagName == "LABEL") {
+                addThing();
+            }
+        }
+        if (evt.key == "M") {
+            if (document.activeElement.tagName == "LABEL") {
+                addDir();
+            }
+        }
+        if (evt.key == "R") {
+            percModeFrac = !percModeFrac;
+            completenessUpdate();
+        }
+    }
+    if (evt.key == "Shift") {
+        return;
+    }
+    if (evt.key == doomsday.code[doomsday.completionPoint]) {
+        doomsday.completionPoint++;
+        if (doomsday.completionPoint >= doomsday.code.length) {
+            localStorage.list = "[]";
+            Array.from(document.getElementsByTagName("input")).forEach(element => {
+                element.value = "";
+                element.checked = false;
+            });
+            location.reload();
+        }
+    }
+    else {
+        doomsday.completionPoint = 0;
+    }
+};
+
+function settings() {
+    if ($("settingsMenu").style.display == "") {
+        $("settingsMenu").style.display = "none";
+    }
+    else {
+        $("settingsMenu").style.display = "";
+        $("paddings").focus();
+    }
+}
+
+
+function classism(thing) {
+    var choices = [];
+    for (var i = 0; i < thing.children.length; i++) {
+        choices.push(thing.children[i].value);
+    }
+    thing.onchange = () => {
+        choices.forEach(choice => {
+            document.body.classList.remove(thing.id + "-" + choice);
+        });
+        document.body.classList.add(thing.id + "-" + thing.value);
+    }
+    thing.onchange();
+}
+
+
+classism($("paddings"));
+classism($("colors"));

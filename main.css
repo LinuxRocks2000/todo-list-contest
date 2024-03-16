@@ -1,22 +1,64 @@
 * {
     font-family: sans-serif;
-    color: white;
 }
 
 body {
+    color: white;
     display: flex;
     height: 100vh;
     width: 100vw;
     padding: 0px;
     margin: 0px;
-    padding-top: 1.2em; /* for the header */
+    padding-top: calc(1em + var(--standard-padding) * 2); /* for the header */
     box-sizing: border-box;
     justify-content: stretch;
     align-items: stretch;
+    --standard-padding: 10px;
+    --button-bg: darkblue;
+    --button-hovered: purple;
+    --standard-highlight1: crimson;
+    --standard-highlight2: blueviolet;
+    --standard-highlight3: rgb(51, 23, 51);
+    --standard-highlight4: rgb(92, 70, 74);
+}
+
+body.paddings-noasitol {
+    --standard-padding: 0px;
+}
+
+body.paddings-thicc {
+    --standard-padding: 50px;
+}
+
+body.colors-flat {
+    --button-bg: #888;
+    --button-hovered: #999;
+    --standard-highlight1: black;
+    --standard-highlight2: black;
+    --standard-highlight3: #444;
+    --standard-highlight4: #333;
+}
+
+body.colors-minimal {
+    --button-bg: #888;
+    --button-hovered: black;
+    --standard-highlight1: black;
+    --standard-highlight2: black;
+    --standard-highlight3: #222;
+    --standard-highlight4: #222;
+}
+
+body.colors-light {
+    color: black;
+    --button-bg: white;
+    --button-hovered: grey;
+    --standard-highlight1: #AAA;
+    --standard-highlight2: #AAA;
+    --standard-highlight3: white;
+    --standard-highlight4: #EEE;
 }
 
 #header {
-    height: 1em;
     background-color: black;
     text-align: center;
     position: absolute;
@@ -24,11 +66,12 @@ body {
     top: 0px;
     left: 0px;
     color: white;
-    padding-bottom: 0.2em;
+    padding: var(--standard-padding);
+    box-sizing: border-box;
 }
 
 #nav {
-    background-color: rgb(51, 23, 51);
+    background-color: var(--standard-highlight3);
     overflow-x: auto;
     width: 20%;
     display: flex;
@@ -45,13 +88,13 @@ body > div {
     padding: 50px;
     padding-left: 100px;
     padding-right: 100px;
-    background-color: rgb(51, 51, 51);
+    background-color: var(--standard-highlight4);
 }
 
 #nav > span {
     padding: 20px;
     text-align: center;
-    background-color: blue;
+    background-color: var(--standard-highlight4);
     width: 100%;
     display: inline-block;
     box-sizing: border-box;
@@ -75,9 +118,9 @@ input.nest-box {
 
 .nest-box + label, li {
     text-align: center;
-    border: 2px solid crimson;
+    border: 2px solid var(--standard-highlight1);
     border-right: none;
-    padding: 5px;
+    padding: var(--standard-padding);
     padding-right: 0px;
     border-radius: 2px;
     margin: 5px;
@@ -87,7 +130,7 @@ input.nest-box {
 
 li.nest {
     border: none;
-    border-left: 2px solid blueviolet;
+    border-left: 2px solid var(--standard-highlight2);
     box-sizing: border-box;
 }
 
@@ -140,14 +183,13 @@ li.nest {
 
 #completion {
     font-family: monospace;
-    color: white;
     background-color: black;
     position: fixed;
-    top: 1.2em;
+    top: calc(2em + 2 * var(--standard-padding));
     right: 0px;
     display: inline-block;
     width: auto;
-    padding: 10px;
+    padding: var(--standard-padding);
 }
 
 #weight {
@@ -156,4 +198,45 @@ li.nest {
 
 .percentage {
     float: left;
+}
+
+#shortcuts {
+    display: flex;
+    position: absolute;
+    bottom: 0px;
+    right: 0px;
+    width: auto;
+    background-color: var(--standard-highlight1);
+}
+
+#shortcuts > div {
+    padding: var(--standard-padding);
+}
+
+#settingsButton {
+    position: absolute;
+    right: 0px;
+    top: 0px;
+}
+
+button, select {
+    background-color: var(--button-bg);
+    border: none;
+    padding: var(--standard-padding);
+}
+
+button:hover, select:hover {
+    background-color: var(--button-hovered);
+}
+
+#settingsMenu {
+    background-color: var(--standard-highlight4);
+    font-weight: bold;
+    position: absolute;
+    top: calc(1.2em + var(--standard-padding));
+    left: 0px;
+    height: calc(100vh - 1.2em);
+    width: 100vw;
+    padding: 50px;
+    box-sizing: border-box;
 }
