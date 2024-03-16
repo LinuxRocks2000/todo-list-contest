@@ -10,6 +10,7 @@ body {
     padding: 0px;
     margin: 0px;
     padding-top: 1.2em; /* for the header */
+    box-sizing: border-box;
     justify-content: stretch;
     align-items: stretch;
 }
@@ -29,8 +30,10 @@ body {
 #nav {
     background-color: rgb(51, 23, 51);
     overflow-x: auto;
-    width: fit-content;
-    max-width: 20%;
+    width: 20%;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
 }
 
 body > div {
@@ -61,25 +64,30 @@ ul {
     margin-top: 0px;
 }
 
-input[type="checkbox"] {
+input.nest-box {
     display: none;
 }
 
 .nest-box + label {
     display: block;
+    background-image: linear-gradient(90deg, brown, brown var(--completeness), transparent var(--completeness), transparent);
 }
 
 .nest-box + label, li {
     text-align: center;
     border: 2px solid crimson;
+    border-right: none;
     padding: 5px;
+    padding-right: 0px;
     border-radius: 2px;
     margin: 5px;
+    margin-right: 0px;
     box-sizing: border-box;
 }
 
 li.nest {
-    border: 2px solid blueviolet;
+    border: none;
+    border-left: 2px solid blueviolet;
     box-sizing: border-box;
 }
 
@@ -102,10 +110,50 @@ li.nest {
 #nav > div {
     overflow-x: scroll;
     height: 100%;
+    width: 100%;
 }
 
 #nav > div > ul {
-    width: max-content;
     padding: 0px;
     margin: 10px;
+}
+
+#utilbar {
+    width: auto;
+    display: flex;
+    position: absolute;
+    background-color: white;
+    transition: top 0.5s, left 0.5s;
+}
+
+#utilBar.directoryMode > #addButton, #utilBar.directoryMode > #addDirButton {
+    display: inline-block !important;
+}
+
+#utilbar.directoryMode > * {
+    display: initial !important;
+}
+
+#utilbar > #addButton, #utilbar > #addDirButton {
+    display: none;
+}
+
+#completion {
+    font-family: monospace;
+    color: white;
+    background-color: black;
+    position: fixed;
+    top: 1.2em;
+    right: 0px;
+    display: inline-block;
+    width: auto;
+    padding: 10px;
+}
+
+#weight {
+    color: black;
+}
+
+.percentage {
+    float: left;
 }

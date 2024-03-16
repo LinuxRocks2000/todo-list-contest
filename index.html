@@ -1,7 +1,13 @@
 <!DOCTYPE html><html><head><title>The Todo List Contest</title><link rel="stylesheet" href="main.css"></head><body>
 <div id="header">Todo List Contest: Pusheen's Entry (GPLv3)</div>
-<div id="nav"><span>Your Tasks</span>
+<div id="nav"><span>Your Tasks <img src="res/add.svg" onclick="addThing(list);"><img src="res/add-dir.svg" onclick="addDir(list);"></span>
 <div id="navInside"></div></div>
 <div id="content" contenteditable="true"></div>
+<div id="completion" style="display: none;"><input type="number" pattern="[0-9]*" id="weight" style="width: 4ch;"><input type="checkbox" id="checkboxy"></div>
+<div id="utilbar" style="display: none;">
+    <img src="res/trash.svg" onclick="delThing();">
+    <img src="res/add-dir.svg" onclick="addDir();" id="addDirButton">
+    <img src="res/add.svg" onclick="addThing();" id="addButton">
+</div>
 <script src="main.js"></script>
 </body></html>
