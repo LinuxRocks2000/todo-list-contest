@@ -5,8 +5,8 @@
 <div id="content" contenteditable="true"></div>
 <div id="completion" style="display: none;"><input type="number" pattern="[0-9]*" id="weight" style="width: 4ch;"><input type="checkbox" id="checkboxy"></div>
 <div id="shortcuts">
-    <div>Delete: Alt-Shift-D<br>Add New Directory: Alt-Shift-M<br>Toggle Completion Display Mode: Alt-Shift-R</div>
-    <div>Add New Task: Alt-Shift-N<br>Edit Task: Enter<br>Hard Reset: Type "DoomsdaySuxxorz!!"</div>
+    <div>Delete: Alt-Shift-D<br>Add New Directory: Alt-Shift-M<br>Toggle Completion Display Mode: Alt-Shift-R<br>Go To Top Task: Home</div>
+    <div>Add New Task: Alt-Shift-N<br>Edit Task: Enter<br>Hard Reset: Type "DoomsdaySuxxorz!!"<br>Navigation: Tab/Shift+Tab</div>
 </div>
 <div id="utilbar" style="display: none;">
     <img src="res/trash.svg" onclick="delThing();">
@@ -14,6 +14,8 @@
     <img src="res/add.svg" onclick="addThing();" id="addButton">
 </div>
 <div id="settingsMenu" style="display: none;" tabindex="2">Settings<br><br>Padding Style:<select id="paddings" tabindex="2"><option value="default">Default</option><option value="noasitol">No Asitol</option><option value="thicc">Thiccc</option></select><br>
-Colors:<select id="colors"><option value="lsd">Lysergic acid dyethlamide</option><option value="flat">Flat</option><option value="minimal">Minimal</option><option value="light">Light</option></select></div>
+Colors:<select id="colors"><option value="lsd">Lysergic acid dyethlamide</option><option value="flat">Flat</option><option value="minimal">Minimal</option><option value="light">Light</option></select><br>
+Fonts: <select id="fonts" tabindex="2"><option value="default">Default</option><option value="lsd">Lysergic Acid Dyethlamide</option><option value="beep">Beep</option></select></div>
+<script src="dom.js"></script>
 <script src="main.js"></script>
 </body></html>

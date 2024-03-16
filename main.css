@@ -1,5 +1,11 @@
-* {
-    font-family: sans-serif;
+@font-face {
+    font-family: Papyrus;
+    src: url(res/papyrus.ttf);
+}
+
+@font-face {
+    font-family: Comic;
+    src: url(res/comicsans.ttf);
 }
 
 body {
@@ -20,10 +26,12 @@ body {
     --standard-highlight2: blueviolet;
     --standard-highlight3: rgb(51, 23, 51);
     --standard-highlight4: rgb(92, 70, 74);
+    font-family: sans-serif;
+    --editor-font: monospace;
 }
 
 body.paddings-noasitol {
-    --standard-padding: 0px;
+    --standard-padding: 1px;
 }
 
 body.paddings-thicc {
@@ -58,6 +66,15 @@ body.colors-light {
     --standard-highlight4: #EEE;
 }
 
+body.fonts-lsd {
+    font-family: Papyrus;
+    --editor-font: Comic;
+}
+
+body.fonts-beep {
+    font-family: monospace;
+}
+
 #header {
     background-color: black;
     text-align: center;
@@ -89,6 +106,7 @@ body > div {
     padding-left: 100px;
     padding-right: 100px;
     background-color: var(--standard-highlight4);
+    font-family: var(--editor-font);
 }
 
 #nav > span {

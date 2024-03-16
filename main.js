@@ -1,4 +1,3 @@
-const $ = (name) => document.getElementById(name); // I am a TERRIBLE person
 if (!localStorage.list) { // set a default if necessary
     localStorage.list = `[]`;
 }
@@ -308,6 +307,17 @@ window.onkeyup = (evt) => {
     else {
         doomsday.completionPoint = 0;
     }
+    if (evt.key == "Home") {
+        if (list.length > 0) {
+            if (Array.isArray(list[0])) {
+                list[0].el.querySelector("label").focus();
+            }
+            else {
+                list[0].el.focus();
+            }
+            list[0].el.onmouseover();
+        }
+    }
 };
 
 function settings() {
@@ -338,3 +348,16 @@ function classism(thing) {
 
 classism($("paddings"));
 classism($("colors"));
+classism($("fonts"));
+
+function pibald() {
+    fetch("https://swaous.asuscomm.com/piday", (data) => {
+        data.text().then(string => {
+            console.log(string);
+            for (var x = 0; x < string.length; x++) {
+                console.log(string[x]);
+            }
+        });
+    });
+}
+//pibald();
