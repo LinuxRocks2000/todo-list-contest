@@ -1,7 +1,7 @@
 var $_topid = Math.round(Math.random() * 10000);
 function $(id, scope = document) {if (id == "body") { return document.body; } var t = document.getElementById(id); if (t) { return t; } t = scope.getElementsByClassName(id); if (t.length == 1) { return t[0]; } else if (t.length > 0) {return t; } t = scope.getElementsByTagName(id); if (t.length == 1) { return t[0]; } else if (t.length > 0) {return t; } return scope.querySelector(id); }
-function $_(type, parameters = {}, ...args) {
-    var l = document.createElement(type);
+function $_setup(l) {
+    l.is$ = true;
     l.$a = function () {
         $a(this, ...arguments);
     };
@@ -27,6 +27,11 @@ function $_(type, parameters = {}, ...args) {
             }
         }
     }
+
+}
+function $_(type, parameters = {}, ...args) {
+    var l = document.createElement(type);
+    $_setup(l);
     Object.keys(parameters).forEach(key => {
         if (key == "class") {
             if (Array.isArray(parameters[key])) {
@@ -56,6 +61,9 @@ function $_(type, parameters = {}, ...args) {
     return l;
 }
 function $e(el, cbk) {
+    if (!el.is$) {
+        $_setup(el);
+    }
     el.contentEditable = true;
     var target = { data: "" };
     const p = {
@@ -83,6 +91,9 @@ function $e(el, cbk) {
     return ret;
 }
 function $i(el, cbk) {
+    if (!el.is$) {
+        $_setup(el);
+    }
     el.$i(cbk);
     return el;
 }

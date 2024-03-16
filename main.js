@@ -6,26 +6,34 @@ if (!localStorage.todolist) { // set a default if necessary
 class Task { // a Task that contains a Weight, a State, and 0 or more subtasks
     // a Task's total weight is equal to weight + the weight of every subtask
     // a task is complete if it has the complete flag and every subtask has the complete flag
-    constructor(nameText, data, weight) {
-        this.parent = undefined;
-        this.name = name;
-        this.dataEl = $_("textarea", { class: "editor" }, data);
-        this.data = $e(this.dataEl, () => {
-            this.notifyChange();
-        });
+    constructor(nameText, data, weight, complete) {
         this.weight = weight;
-        this.isComplete = false;
+        this.isComplete = complete;
+        this.parent = undefined;
+        this.dataEl = $_("textarea", { class: "editor" }, data);
         this.subtasks = [];
-        var me = this;
         var name = $i($k($t($_("div", { class: "name" }, nameText)), () => {
             me.name.data = me.name.data.replace("\n", "");
             me.dataEl.focus();
         }), () => {
             $("content").innerHTML = ""; // clear it
             $("content").appendChild(me.dataEl);
-        });
-        this.name = $e(name, () => {
-            this.notifyChange();
+            $show($("completion"));
+            $("weight").value = me.weight;
+            $("complete").checked = me.isComplete;
+            $i($("complete"), () => {
+                if (editorOwner == this) {
+                    me.isComplete = $("complete").checked;
+                    me.notifyChange();
+                }
+            });
+            $e($("weight"), () => {
+                if (editorOwner == this) {
+                    me.weight = $("weight").value - 0;
+                    me.notifyChange();
+                }
+            });
+            editorOwner = this;
         });
         this.element = $_("div", { class: "task" }, name);
         $h(this.element, () => {
@@ -35,7 +43,15 @@ class Task { // a Task that contains a Weight, a State, and 0 or more subtasks
             $("floatingbar").style.left = rect.right + "px";
             hoverOwner = this;
         });
+        var me = this;
+        this.name = $e(name, () => {
+            me.notifyChange();
+        });
+        this.data = $e(this.dataEl, () => {
+            me.notifyChange();
+        });
         this.stub = true;
+        this.renderCompletion();
     }
 
     complete() { 
@@ -50,11 +66,30 @@ class Task { // a Task that contains a Weight, a State, and 0 or more subtasks
         return true;
     }
 
+    completion() {
+        var ret = [0, this.weight];
+        if (this.isComplete) {
+            ret[0] += this.weight;
+        }
+        for (var i = 0; i < this.subtasks.length; i++) {
+            var v = this.subtasks[i].completion();
+            ret[0] += v[0];
+            ret[1] += v[1];
+        }
+        return ret;
+    }
+
     getContainer() {
         return this.element;
     }
 
+    renderCompletion() {
+        var cmp = this.completion();
+        this.element.style.setProperty("--completion", cmp[0] / cmp[1] * 100 + "%");
+    }
+
     notifyChange() { // called by children to notify the parent that a change occurred on the tree, affecting every node above it
+        this.renderCompletion();
         if (this.parent) {
             this.parent.notifyChange();
         }
@@ -72,9 +107,7 @@ class Task { // a Task that contains a Weight, a State, and 0 or more subtasks
         }
         this.stub = false;
         this.subtasks.push(child);
-        if (this.parent) {
-            this.parent.notifyChange();
-        }
+        this.notifyChange();
     }
 
     attach(parent) { // attach to a task or task-like (Set)
@@ -103,8 +136,7 @@ class Task { // a Task that contains a Weight, a State, and 0 or more subtasks
     }
 
     static unpack(data) {
-        var ret = new Task(data.name, data.content, data.weight);
-        ret.complete = data.complete;
+        var ret = new Task(data.name, data.content, data.weight, data.complete);
         data.tasks.forEach(taskSkeleton => {
             var task = Task.unpack(taskSkeleton);
             task.attach(ret);
@@ -131,7 +163,7 @@ class Task { // a Task that contains a Weight, a State, and 0 or more subtasks
                 this.subtasks.splice(i, 1);
             }
         }
-        this.parent.notifyChange();
+        this.notifyChange();
         if (this.subtasks.length == 0) {
             this.stub = true;
             $r($("input", this.element));
@@ -148,6 +180,7 @@ class Task { // a Task that contains a Weight, a State, and 0 or more subtasks
             hoverOwner = undefined;
             $hide($("floatingbar"));
         }
+        $hide($("completion"));
         $r(this.dataEl);
     }
 }
@@ -229,6 +262,7 @@ class Set {
 
 var todolist = JSON.parse(localStorage.todolist);
 var hoverOwner = undefined;
+var editorOwner = undefined;
 function commit() {
     localStorage.todolist = JSON.stringify(todolist);
 }
@@ -247,7 +281,7 @@ function addThing(at) {
     if (at == undefined) {
         at = root;
     }
-    var thing = new Task("Untitled", "", 1);
+    var thing = new Task("Untitled", "", 1, false);
     thing.attach(at);
 }
 

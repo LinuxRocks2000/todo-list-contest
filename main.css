@@ -254,6 +254,11 @@ div.task {
     margin: 5px;
     border-left: 2px solid var(--standard-highlight1);
     overflow: hidden;
+    --completion: 0%;
+    background-image: linear-gradient(90deg, var(--standard-highlight1), var(--standard-highlight1));
+    background-size: var(--completion) var(--standard-padding);
+    transition: background-size 0.5s;
+    background-repeat: no-repeat;
 }
 
 input.taskExpander ~ div.task {
