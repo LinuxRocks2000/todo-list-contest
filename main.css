@@ -95,6 +95,7 @@ body.fonts-beep {
     flex-direction: column;
     height: 100%;
     padding-left: 2px;
+    justify-content: stretch;
 }
 
 body > div {
@@ -119,10 +120,28 @@ body > div {
     box-sizing: border-box;
 }
 
-#nav > div {
-    overflow-x: scroll;
+#navInside {
     height: 100%;
+    overflow-x: scroll;
     width: 100%;
+    box-sizing: border-box;
+}
+
+.utilbar > img {
+    height: 1em;
+    padding: 2px;
+}
+
+.utilbar {
+    background-color: var(--standard-highlight1);
+    display: flex;
+    height: min-content;
+    justify-content: space-around;
+    padding: var(--standard-padding);
+}
+
+.utilbar > img:hover {
+    background-color: pink;
 }
 
 #nav > div > ul {
@@ -130,24 +149,10 @@ body > div {
     margin: 10px;
 }
 
-#utilbar {
+#floatingbar {
     width: auto;
-    display: flex;
     position: absolute;
-    background-color: white;
     transition: top 0.5s, left 0.5s;
-}
-
-#utilBar.directoryMode > #addButton, #utilBar.directoryMode > #addDirButton {
-    display: inline-block !important;
-}
-
-#utilbar.directoryMode > * {
-    display: initial !important;
-}
-
-#utilbar > #addButton, #utilbar > #addDirButton {
-    display: none;
 }
 
 #completion {
@@ -246,4 +251,16 @@ input.taskExpander ~ div.task {
 input.taskExpander:checked ~ div.task {
     height: auto;
     padding: var(--standard-padding);
+}
+
+.editor {
+    height: 100%;
+    width: 100%;
+    border: none;
+    background-color: transparent;
+    color: inherit;
+}
+
+.set {
+    padding-top: 20px;
 }
