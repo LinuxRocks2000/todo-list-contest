@@ -95,7 +95,7 @@ function $id(el) { el.id = "e41C" + $_topid++; return el; }
 function $t(el, ind = 1) { el.tabIndex = ind; return el; }
 function $show(el) { el.style.display = "initial"; return el; }
 function $hide(el) { el.style.display = "none"; return el; }
-function $r(el) { el.parentNode.removeChild(el); }
+function $r(el) { if (el.parentNode) { el.parentNode.removeChild(el); } }
 
 function $h(el, enter, leave) {
     el.addEventListener("mouseover", (evt) => {

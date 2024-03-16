@@ -127,6 +127,18 @@ body > div {
     box-sizing: border-box;
 }
 
+#navInside {
+    -ms-overflow-style: none;
+    /* Internet Explorer 10+ */
+    scrollbar-width: none;
+    /* Firefox */
+}
+
+#navInside::-webkit-scrollbar {
+    display: none;
+    /* Safari and Chrome */
+}
+
 .utilbar > img {
     height: 1em;
     padding: 2px;
@@ -239,6 +251,7 @@ input.taskExpander:checked + label.taskExpandButton:after {
 div.task {
     padding: var(--standard-padding);
     padding-right: 0px;
+    margin: 5px;
     border-left: 2px solid var(--standard-highlight1);
     overflow: hidden;
 }
@@ -246,11 +259,13 @@ div.task {
 input.taskExpander ~ div.task {
     height: 0px;
     padding: 0px;
+    margin: 0px;
 }
 
 input.taskExpander:checked ~ div.task {
     height: auto;
     padding: var(--standard-padding);
+    padding-right: 0px;
 }
 
 .editor {

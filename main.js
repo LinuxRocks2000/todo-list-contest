@@ -140,7 +140,10 @@ class Task { // a Task that contains a Weight, a State, and 0 or more subtasks
     }
 
     removing() {
-        this.element.parentNode.removeChild(this.element);
+        for (var i = 0; i < this.subtasks.length; i++) {
+            this.subtasks[i].removing();
+        }
+        $r(this.element);
         if (hoverOwner == this) {
             hoverOwner = undefined;
             $hide($("floatingbar"));
