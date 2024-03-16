@@ -94,6 +94,7 @@ body.fonts-beep {
     display: flex;
     flex-direction: column;
     height: 100%;
+    padding-left: 2px;
 }
 
 body > div {
@@ -116,56 +117,6 @@ body > div {
     width: 100%;
     display: inline-block;
     box-sizing: border-box;
-}
-
-ul {
-    list-style-type: none;
-    position: relative;
-    padding-top: 0px;
-    margin-top: 0px;
-}
-
-input.nest-box {
-    display: none;
-}
-
-.nest-box + label {
-    display: block;
-    background-image: linear-gradient(90deg, brown, brown var(--completeness), transparent var(--completeness), transparent);
-}
-
-.nest-box + label, li {
-    text-align: center;
-    border: 2px solid var(--standard-highlight1);
-    border-right: none;
-    padding: var(--standard-padding);
-    padding-right: 0px;
-    border-radius: 2px;
-    margin: 5px;
-    margin-right: 0px;
-    box-sizing: border-box;
-}
-
-li.nest {
-    border: none;
-    border-left: 2px solid var(--standard-highlight2);
-    box-sizing: border-box;
-}
-
-.nest-box + label:after {
-    content: '^';
-}
-
-.nest-box:checked + label:after {
-    content: 'v';
-}
-
-.nest-box + label + ul {
-    display: none;
-}
-
-.nest-box:checked + label + ul {
-    display: initial;
 }
 
 #nav > div {
@@ -257,4 +208,42 @@ button:hover, select:hover {
     width: 100vw;
     padding: 50px;
     box-sizing: border-box;
+}
+
+input.taskExpander {
+    display: none;
+}
+
+label.taskExpandButton {
+    display: block;
+    text-align: center;
+}
+
+label.taskExpandButton:after {
+    content: "^";
+}
+
+label.taskExpandButton {
+    border: 1px dashed var(--standard-highlight2);
+}
+
+input.taskExpander:checked + label.taskExpandButton:after {
+    content: "v"
+}
+
+div.task {
+    padding: var(--standard-padding);
+    padding-right: 0px;
+    border-left: 2px solid var(--standard-highlight1);
+    overflow: hidden;
+}
+
+input.taskExpander ~ div.task {
+    height: 0px;
+    padding: 0px;
+}
+
+input.taskExpander:checked ~ div.task {
+    height: auto;
+    padding: var(--standard-padding);
 }
