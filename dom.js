@@ -8,6 +8,7 @@ function $_setup(l) {
     l._interactions = [];
     l.$i = function (cbk) {
         l.addEventListener("click", cbk);
+        l._interactions.push(cbk);
     };
     l.$v = function (arg) {
         if (arg == undefined) { // returns innerText if it's "contenteditable" (not a real input or textarea), and otherwise returns value.
@@ -89,6 +90,16 @@ function $e(el, cbk) {
     });
     ret.data = el.$v();
     return ret;
+}
+function $E(el, cbk) {
+    if (!el.is$) {
+        $_setup(el);
+    }
+    el.contentEditable = true;
+    el.addEventListener("input", () => {
+        cbk(el);
+    });
+    return el;
 }
 function $i(el, cbk) {
     if (!el.is$) {

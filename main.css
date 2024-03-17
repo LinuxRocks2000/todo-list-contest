@@ -114,10 +114,20 @@ body > div {
 #nav > span {
     padding: 20px;
     text-align: center;
-    background-color: var(--standard-highlight4);
+    background-color: var(--button-bg);
     width: 100%;
     display: inline-block;
     box-sizing: border-box;
+    --completion: 0%;
+    background-image: linear-gradient(90deg, var(--standard-highlight1), var(--standard-highlight1));
+    background-size: var(--completion) 10px;
+    background-position: 0% 100%;
+    transition: background-size 0.5s;
+    background-repeat: no-repeat;
+}
+
+#nav > span:hover {
+    background-color: var(--button-hovered);
 }
 
 #navInside {
@@ -259,6 +269,11 @@ div.task {
     background-size: var(--completion) var(--standard-padding);
     transition: background-size 0.5s;
     background-repeat: no-repeat;
+    background-color: var(--standard-highlight3);
+}
+
+div.task.active {
+    background-color: var(--standard-highlight2);
 }
 
 input.taskExpander ~ div.task {
@@ -277,10 +292,30 @@ input.taskExpander:checked ~ div.task {
     height: 100%;
     width: 100%;
     border: none;
-    background-color: transparent;
+    background-color: rgba(255, 255, 255, 0.1);
     color: inherit;
 }
 
 .set {
     padding-top: 20px;
+}
+
+.setSelect {
+    display: grid;
+    grid-auto-columns: 150px;
+    grid-auto-rows: 150px;
+    grid-auto-flow: column;
+}
+
+.setSelect > div {
+    margin: var(--standard-padding);
+    padding: var(--standard-padding);
+    text-align: center;
+    background-color: white;
+    border-radius: var(--standard-padding);
+    color: black;
+}
+
+.setSelect > div:hover {
+    background-color: #DDD;
 }

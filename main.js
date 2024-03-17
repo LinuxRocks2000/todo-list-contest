@@ -33,6 +33,10 @@ class Task { // a Task that contains a Weight, a State, and 0 or more subtasks
                     me.notifyChange();
                 }
             });
+            if (editorOwner) {
+                editorOwner.element.classList.remove("active");
+            }
+            this.element.classList.add("active");
             editorOwner = this;
         });
         this.element = $_("div", { class: "task" }, name);
@@ -234,10 +238,22 @@ class Set {
         this.notifyChange();
     }
 
+    completion() {
+        var ret = [0, 0];
+        for (var i = 0; i < this.tasks.length; i++) {
+            var v = this.tasks[i].completion();
+            ret[0] += v[0];
+            ret[1] += v[1];
+        }
+        return ret;
+    }
+
     notifyChange() {
         if (this.onchange) {
             this.onchange();
         }
+        var cmp = this.completion();
+        $("#nav > span").style.setProperty("--completion", cmp[0] / cmp[1] * 100 + "%");
     }
 
     findFocus() {
@@ -267,12 +283,15 @@ function commit() {
     localStorage.todolist = JSON.stringify(todolist);
 }
 var root = undefined;
+var currentSet = undefined; // NOT THE SAME THING AS root!
 function openSet(set) {
     root = Set.unpack(todolist[set]);
+    currentSet = todolist[set];
     root.onchange = () => { todolist[root.name] = root.pack(); commit(); };
+    $("navInside").innerHTML = "";
     root.attach($("navInside"));
+    $("setName").innerText = set;
 }
-openSet("my shit");
 
 function addThing(at) {
     if (at == undefined) {
@@ -294,3 +313,47 @@ function delThing(at) {
     }
     at.parent.remove(at);
 }
+
+function genSetSelectMenu() {
+    var ret = $_("div", { class: "setSelect" });
+    Object.keys(todolist).forEach(key => {
+        var set = todolist[key];
+        ret.$a(
+            $t($E($i($_("div", {}, key), () => {
+                openSet(set.name);
+            }), (el) => {
+                delete todolist[set.name];
+                todolist[el.$v()] = set;
+                set.name = el.$v(); // name change alert!
+                if (todolist[set.name] == currentSet) {
+                    openSet(set.name);
+                }
+                commit();
+            }))
+        );
+    });
+    ret.$a(
+        $i($_("div", {}, $_("img", { "src": "res/add.svg" })), () => {
+            todolist["Untitled Set"] = {
+                name: "Untitled Set",
+                tasks: []
+            };
+            setSelectMenu = genSetSelectMenu();
+            $("content").innerHTML = "";
+            $("content").appendChild(setSelectMenu);
+        })
+    );
+    return ret;
+}
+
+var setSelectMenu = genSetSelectMenu();
+$("content").appendChild(setSelectMenu);
+
+window.addEventListener("keyup", (evt) => {
+    if (evt.altKey && evt.shiftKey) {
+        if (evt.key == "X") {
+            $("content").innerHTML = "";
+            $("content").appendChild(setSelectMenu);
+        }
+    }
+});
