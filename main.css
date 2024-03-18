@@ -49,7 +49,7 @@ body.colors-flat {
 
 body.colors-minimal {
     --button-bg: #888;
-    --button-hovered: black;
+    --button-hovered: #777;
     --standard-highlight1: black;
     --standard-highlight2: black;
     --standard-highlight3: #222;
@@ -228,11 +228,8 @@ button:hover, select:hover {
 #settingsMenu {
     background-color: var(--standard-highlight4);
     font-weight: bold;
-    position: absolute;
-    top: calc(1.2em + var(--standard-padding));
-    left: 0px;
-    height: calc(100vh - 1.2em);
-    width: 100vw;
+    width: 100%;
+    height: 100%;
     padding: 50px;
     box-sizing: border-box;
 }
@@ -272,6 +269,14 @@ div.task {
     background-color: var(--standard-highlight3);
 }
 
+.name {
+    display: inline-block;
+}
+
+.completionValue {
+    float: right;
+}
+
 div.task.active {
     background-color: var(--standard-highlight2);
 }
@@ -294,6 +299,7 @@ input.taskExpander:checked ~ div.task {
     border: none;
     background-color: rgba(255, 255, 255, 0.1);
     color: inherit;
+    font-family: var(--editor-font);
 }
 
 .set {
@@ -302,8 +308,8 @@ input.taskExpander:checked ~ div.task {
 
 .setSelect {
     display: grid;
-    grid-auto-columns: 150px;
-    grid-auto-rows: 150px;
+    grid-auto-columns: calc(130px + var(--standard-padding) * 4);
+    grid-auto-rows: calc(130px + var(--standard-padding) * 4);
     grid-auto-flow: column;
 }
 

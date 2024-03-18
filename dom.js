@@ -120,6 +120,7 @@ function $hide(el) { el.style.display = "none"; return el; }
 function $r(el) { if (el.parentNode) { el.parentNode.removeChild(el); } }
 
 function $h(el, enter, leave) {
+    el.$hover = [enter, leave];
     el.addEventListener("mouseover", (evt) => {
         if (enter) {
             enter();
@@ -137,12 +138,31 @@ function $h(el, enter, leave) {
     return el;
 }
 
+var $_lastActive = undefined;
+
 window.addEventListener("keyup", (evt) => {
     if (evt.key == "Enter") { // enter-key interaction
         if (document.activeElement._interactions) {
             document.activeElement._interactions.forEach(interaction => {
                 interaction.call(document.activeElement);
             });
+            evt.stopPropagation();
+            return false;
         }
+    }
+    if (evt.key == "Tab") {
+        if (document.activeElement.$hover && document.activeElement.$hover[0]) {
+            document.activeElement.$hover[0]();
+        }
+        else if (document.activeElement.parentNode.$hover && document.activeElement.parentNode.$hover[0]) {
+            document.activeElement.parentNode.$hover[0]();
+        }
+        if ($_lastActive && $_lastActive.$hover && $_lastActive.$hover[1]) {
+            $_lastActive.$hover[1]();
+        }
+        else if ($_lastActive && $_lastActive.parentNode.$hover && $_lastActive.parentNode.$hover[1]) {
+            $_lastActive.parentNode.$hover[1]();
+        }
+        $_lastActive = document.activeElement;
     }
 });

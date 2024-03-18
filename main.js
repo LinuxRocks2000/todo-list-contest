@@ -2,6 +2,26 @@ if (!localStorage.todolist) { // set a default if necessary
     localStorage.todolist = "{}";
 }
 
+var completionFracMode = false;
+
+
+function formatCompletion(cmp) {
+    if (completionFracMode) {
+        return cmp[0] + '/' + cmp[1];
+    }
+    else {
+        return Math.round(cmp[0] / cmp[1] * 100) + "%";
+    }
+}
+
+
+function needsATrim(data) {
+    var nDex = data.indexOf("\n");
+    if (nDex != -1 && nDex != data.length - 1) {
+        return true;
+    }
+}
+
 
 class Task { // a Task that contains a Weight, a State, and 0 or more subtasks
     // a Task's total weight is equal to weight + the weight of every subtask
@@ -11,11 +31,10 @@ class Task { // a Task that contains a Weight, a State, and 0 or more subtasks
         this.isComplete = complete;
         this.parent = undefined;
         this.dataEl = $_("textarea", { class: "editor" }, data);
+        this.completionEl = $_("span", { class: "completionValue" });
         this.subtasks = [];
-        var name = $i($k($t($_("div", { class: "name" }, nameText)), () => {
-            me.name.data = me.name.data.replace("\n", "");
-            me.dataEl.focus();
-        }), () => {
+        var name = $i($t($_("div", { class: "name" }, nameText)), () => {
+            me.name.data = me.name.data.replace("\n", "").trim();
             $("content").innerHTML = ""; // clear it
             $("content").appendChild(me.dataEl);
             $show($("completion"));
@@ -37,9 +56,10 @@ class Task { // a Task that contains a Weight, a State, and 0 or more subtasks
                 editorOwner.element.classList.remove("active");
             }
             this.element.classList.add("active");
+            me.dataEl.focus();
             editorOwner = this;
         });
-        this.element = $_("div", { class: "task" }, name);
+        this.element = $_("div", { class: "task" }, name, this.completionEl);
         $h(this.element, () => {
             $show($("floatingbar"));
             var rect = this.element.getBoundingClientRect();
@@ -90,6 +110,7 @@ class Task { // a Task that contains a Weight, a State, and 0 or more subtasks
     renderCompletion() {
         var cmp = this.completion();
         this.element.style.setProperty("--completion", cmp[0] / cmp[1] * 100 + "%");
+        this.completionEl.innerText = formatCompletion(cmp);
     }
 
     notifyChange() { // called by children to notify the parent that a change occurred on the tree, affecting every node above it
@@ -220,13 +241,13 @@ class Set {
 
     attach(element) { // attach this Set to the DOM
         $a(element, this.element);
-        $h(element, () => {
+        $t($h(this.element, () => {
             $show($("floatingbar"));
             var rect = this.element.getBoundingClientRect();
             $("floatingbar").style.top = rect.top + "px";
             $("floatingbar").style.left = rect.right + "px";
             hoverOwner = this;
-        });
+        }));
     }
 
     getContainer() {
@@ -254,6 +275,7 @@ class Set {
         }
         var cmp = this.completion();
         $("#nav > span").style.setProperty("--completion", cmp[0] / cmp[1] * 100 + "%");
+        $("globalCompletion").innerText = formatCompletion(cmp);
     }
 
     findFocus() {
@@ -314,14 +336,19 @@ function delThing(at) {
     at.parent.remove(at);
 }
 
+var setSelectCurrent = undefined;
+
 function genSetSelectMenu() {
     var ret = $_("div", { class: "setSelect" });
     Object.keys(todolist).forEach(key => {
         var set = todolist[key];
         ret.$a(
-            $t($E($i($_("div", {}, key), () => {
+            $h($t($E($i($_("div", {}, key), () => {
                 openSet(set.name);
             }), (el) => {
+                if (needsATrim(el.$v())) {
+                    el.$v(el.$v().replace("\n", "").trim());
+                }
                 delete todolist[set.name];
                 todolist[el.$v()] = set;
                 set.name = el.$v(); // name change alert!
@@ -329,11 +356,15 @@ function genSetSelectMenu() {
                     openSet(set.name);
                 }
                 commit();
-            }))
+            })), () => {
+                setSelectCurrent = set;
+            }, () => {
+                setSelectCurrent = undefined;
+            })
         );
     });
     ret.$a(
-        $i($_("div", {}, $_("img", { "src": "res/add.svg" })), () => {
+        $t($i($_("div", {}, $_("img", { "src": "res/add.svg" })), () => {
             todolist["Untitled Set"] = {
                 name: "Untitled Set",
                 tasks: []
@@ -341,7 +372,7 @@ function genSetSelectMenu() {
             setSelectMenu = genSetSelectMenu();
             $("content").innerHTML = "";
             $("content").appendChild(setSelectMenu);
-        })
+        }))
     );
     return ret;
 }
@@ -349,11 +380,63 @@ function genSetSelectMenu() {
 var setSelectMenu = genSetSelectMenu();
 $("content").appendChild(setSelectMenu);
 
+$t($i($("#nav > span"), () => {
+    $("content").innerHTML = "";
+    $("content").appendChild(setSelectMenu);
+}));
+
+function classism(el) { // manage CSS classes on document.body with a <select> element
+    var selectOptions = [];
+    for (var i = 0; i < el.children.length; i++) {
+        selectOptions.push(el.children[i].value);
+    }
+    el.onchange = () => {
+        selectOptions.forEach(option => {
+            document.body.classList.remove(el.id + "-" + option);
+        });
+        document.body.classList.add(el.id + "-" + el.value);
+    };
+    el.onchange();
+}
+
+classism($("colors"));
+classism($("fonts"));
+classism($("paddings"));
+
+var settingsContext = $("settingsMenu");
+settingsContext.parentNode.removeChild(settingsContext); // remove it from the DOM tree; we're going to use it later
+
 window.addEventListener("keyup", (evt) => {
     if (evt.altKey && evt.shiftKey) {
         if (evt.key == "X") {
             $("content").innerHTML = "";
             $("content").appendChild(setSelectMenu);
         }
+        if (evt.key == "D") {
+            if (setSelectCurrent) {
+                delete todolist[setSelectCurrent.name];
+                console.log(todolist);
+                commit();
+                openSet(Object.keys(todolist)[0]);
+                setSelectMenu = genSetSelectMenu();
+                $("content").innerHTML = "";
+                $("content").appendChild(setSelectMenu);
+            }
+            else {
+                delThing();
+            }
+        }
+        if (evt.key == "N") {
+            addThing();
+        }
+    }
+    if (evt.key == "Home") {
+        root.element.$hover[0]();
+        root.element.focus();
     }
 });
+
+function settings() {
+    $("content").innerHTML = "";
+    $("content").appendChild(settingsContext);
+}
