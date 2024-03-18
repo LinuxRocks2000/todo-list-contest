@@ -27,8 +27,11 @@ function $_setup(l) {
                 l.innerText = arg;
             }
         }
+    };
+    l.$ = function (id) {
+        return $(id, l);
     }
-
+    return l;
 }
 function $_(type, parameters = {}, ...args) {
     var l = document.createElement(type);

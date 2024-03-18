@@ -2,7 +2,16 @@ if (!localStorage.todolist) { // set a default if necessary
     localStorage.todolist = "{}";
 }
 
-var completionFracMode = false;
+var completionFracMode = $("displayMode").checked;
+$("displayMode").onclick = () => {
+    completionFracMode = $("displayMode").checked;
+    root.renderCompletion();
+}
+
+var confirmbeforedelete = $("confirmbeforedelete").checked;
+$("confirmbeforedelete").onclick = () => {
+    confirmbeforedelete = $("confirmbeforedelete").checked;
+}
 
 
 function formatCompletion(cmp) {
@@ -33,8 +42,11 @@ class Task { // a Task that contains a Weight, a State, and 0 or more subtasks
         this.dataEl = $_("textarea", { class: "editor" }, data);
         this.completionEl = $_("span", { class: "completionValue" });
         this.subtasks = [];
-        var name = $i($t($_("div", { class: "name" }, nameText)), () => {
+        var name = $k($i($t($_("div", { class: "name" }, nameText)), () => {
             me.name.data = me.name.data.replace("\n", "").trim();
+            if (me.name.data == "") {
+                me.name.data = "Untitled Task";
+            }
             $("content").innerHTML = ""; // clear it
             $("content").appendChild(me.dataEl);
             $show($("completion"));
@@ -56,8 +68,9 @@ class Task { // a Task that contains a Weight, a State, and 0 or more subtasks
                 editorOwner.element.classList.remove("active");
             }
             this.element.classList.add("active");
-            me.dataEl.focus();
             editorOwner = this;
+        }), () => {
+            me.dataEl.focus();
         });
         this.element = $_("div", { class: "task" }, name, this.completionEl);
         $h(this.element, () => {
@@ -111,10 +124,12 @@ class Task { // a Task that contains a Weight, a State, and 0 or more subtasks
         var cmp = this.completion();
         this.element.style.setProperty("--completion", cmp[0] / cmp[1] * 100 + "%");
         this.completionEl.innerText = formatCompletion(cmp);
+        this.subtasks.forEach(task => {
+            task.renderCompletion();
+        });
     }
 
     notifyChange() { // called by children to notify the parent that a change occurred on the tree, affecting every node above it
-        this.renderCompletion();
         if (this.parent) {
             this.parent.notifyChange();
         }
@@ -273,9 +288,16 @@ class Set {
         if (this.onchange) {
             this.onchange();
         }
+        this.renderCompletion();
+    }
+
+    renderCompletion() {
         var cmp = this.completion();
         $("#nav > span").style.setProperty("--completion", cmp[0] / cmp[1] * 100 + "%");
         $("globalCompletion").innerText = formatCompletion(cmp);
+        this.tasks.forEach(task => {
+            task.renderCompletion();
+        });
     }
 
     findFocus() {
@@ -327,13 +349,27 @@ function addThing(at) {
 }
 
 function delThing(at) {
-    if (at == undefined) {
-        at = hoverOwner;
+    if (setSelectCurrent) {
+        if (!confirmbeforedelete || confirm("Are you sure you want to delete the " + setSelectCurrent.name + " Set?")) {
+            delete todolist[setSelectCurrent.name];
+            commit();
+            $("navInside").innerHTML = "";
+            setSelectMenu = genSetSelectMenu();
+            $("content").innerHTML = "";
+            $("content").appendChild(setSelectMenu);
+        }
     }
-    if (at == root) {
-        return; // we will never delete root!
+    else {
+        if (!confirmbeforedelete || confirm("Are you sure you want to delete this Task?")) {
+            if (at == undefined) {
+                at = hoverOwner;
+            }
+            if (at == root) {
+                return; // we will never delete root!
+            }
+            at.parent.remove(at);
+        }
     }
-    at.parent.remove(at);
 }
 
 var setSelectCurrent = undefined;
@@ -413,21 +449,15 @@ window.addEventListener("keyup", (evt) => {
             $("content").appendChild(setSelectMenu);
         }
         if (evt.key == "D") {
-            if (setSelectCurrent) {
-                delete todolist[setSelectCurrent.name];
-                console.log(todolist);
-                commit();
-                openSet(Object.keys(todolist)[0]);
-                setSelectMenu = genSetSelectMenu();
-                $("content").innerHTML = "";
-                $("content").appendChild(setSelectMenu);
-            }
-            else {
-                delThing();
-            }
+            delThing();
         }
         if (evt.key == "N") {
             addThing();
+        }
+        if (evt.key == "R") {
+            completionFracMode = !completionFracMode;
+            $("displayMode").checked = completionFracMode;
+            root.renderCompletion();
         }
     }
     if (evt.key == "Home") {

@@ -325,3 +325,9 @@ input.taskExpander:checked ~ div.task {
 .setSelect > div:hover {
     background-color: #DDD;
 }
+
+#displaymode-outer {
+    position: absolute;
+    bottom: 0px;
+    left: 0px;
+}
